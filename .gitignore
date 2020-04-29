@@ -1,0 +1,7 @@
+.DS_Store
+*.hex
+*.elf
+*.eep
+*.o
+*.map
+src/usb-iface/obj
