@@ -1,4 +1,4 @@
-#include "led-button.h"
+#include "user-io.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -9,12 +9,16 @@
 /* Button on digital pin 12 port B */
 #define PORTB_BUTTON (1 << 4)
 
+/* Buzzer (digital pin 2) on port D */
+#define PORTD_BUZZER (1 << 2)
+
 
 /* Initializes the LED/button interface. */
 void init_led_button(void)
 {
-	/* Configure LED as output, button as input */
+	/* Configure LED as output, buzzer as output, button as input */
 	DDRB = (DDRB | PORTB_LED) & (~PORTB_BUTTON);
+	DDRD |= PORTD_BUZZER;
 
 	/* Enable pullup on button */
 	PORTB |= PORTB_BUTTON;
@@ -70,4 +74,13 @@ uint8_t blink_led(uint16_t on_time_ms, uint16_t off_time_ms, uint8_t count,
 	}
 
 	return button_presses;
+}
+
+
+/* Emit a brief beep the buzzer. */
+void beep(void)
+{
+	PORTD |= PORTD_BUZZER;
+	_delay_ms(1);
+	PORTD &= ~PORTD_BUZZER;
 }

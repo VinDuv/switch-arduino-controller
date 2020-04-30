@@ -5,7 +5,7 @@
 #include <util/delay.h>
 
 #include "automation-utils.h"
-#include "led-button.h"
+#include "user-io.h"
 
 /* Static functions */
 static void temporary_control(void);
@@ -20,6 +20,9 @@ int main(void)
 {
 	init_automation();
 	init_led_button();
+
+	/* Initial beep to confirm that the buzzer works */
+	beep();
 
 	/* Wait for the user to press the button (should be on the Switch main menu) */
 	blink_led(100, 100, 1, true);
@@ -122,6 +125,9 @@ void max_raid(void)
 	set_text_speed(/* fast_speed */ false, /* save */ true);
 
 	for (;;) {
+		/* Ask the user to look at the light pillar color */
+		beep();
+
 		/* Drop the Wishing Piece in the den */
 		use_wishing_piece_and_pause();
 
@@ -155,6 +161,9 @@ void max_raid(void)
 	);
 
 	for (;;) {
+		/* Ask the user to look at the Pokémon in the Max Raid Battle */
+		beep();
+
 		/* Do the user wants to do this Raid? */
 		if (blink_led(250, 250, 10, false)) {
 			/* Restore the clock */

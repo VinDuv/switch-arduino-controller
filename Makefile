@@ -8,7 +8,7 @@ all: swsh.hex usb-iface.hex
 # Put program definitions (.o => src/<prog>.elf) here
 # make <prog>.hex will generate the final program and make flash-<prog> will
 # flash it.
-src/swsh.elf: src/swsh/swsh.o src/lib/automation.o src/lib/automation-utils.o src/lib/led-button.o
+src/swsh.elf: src/swsh/swsh.o src/lib/automation.o src/lib/automation-utils.o src/lib/user-io.o
 
 flash-%: %.hex
 	avrdude -p atmega328p -c avrispmkii -P usb -U flash:w:$<:i

@@ -8,7 +8,11 @@ Requirements
 
 You will need an Arduino UNO R3, an external Arduino programmer, and a
 pushbutton inserted in the Arduino board, between pins 13 and GND (on the top
-row). See [the main README](../../README.md#required-hardware) for details.
+row).
+
+You can additionally install a buzzer between pins 2 and GND.
+
+See [the main README](../../README.md#required-hardware) for details.
 
 Installation
 ------------

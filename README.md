@@ -6,7 +6,8 @@ Switch controller using an Arduino UNO R3.
 
 The API allows sending button presses/stick movements on the emulated
 controller, to read the state of a physical button connected between the
-Arduino’s pins 12 and ground, and to control the Arduino’s on-board LED.
+Arduino’s pins 12 and ground, and to control the Arduino’s on-board LED as well
+as an external buzzer.
 
 Pokémon Sword/Shield automation
 -------------------------------
@@ -67,6 +68,9 @@ Required hardware
    be tested. (Note: DFU programming may also stop working once this program is
    flashed onto the Arduino, so you should not attempt it if you do not have
    access to an external programmer)
+ - A buzzer can be optionally attached between pins 2 and GND of the Arduino
+   board, in order for the automation process to notify the user when something
+   needs their attention.
 
 Required software
 -----------------
