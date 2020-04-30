@@ -22,20 +22,29 @@
 void init_led_button(void);
 
 /*
- * Count the presses on the button during the specified period.
- * Implements basic debouncing.
+ * Wait the specified amount of time for the button to be pressed. If the
+ * button is not pressed, this function returns false. If the button, is
+ * pressed, this function waits for the button to be released, and returns
+ * true.
  */
-uint8_t count_button_presses(uint16_t wait_ms);
+bool wait_for_button_timeout(uint16_t led_on_time_ms, uint16_t led_off_time_ms,
+	uint16_t timeout_ms);
 
 /*
- * Blink the LED with the specified delays and count. Return the number of
- * times the button was pressed during that time.
- *
- * If wait_for_first_press is true, the count will only start decrementing
- * after the first button press.
+ * Blink the LED and wait for the user to press the button. Return the number
+ * of presses. The user is allowed 500 ms between button presses before this
+ * function returns.
  */
-uint8_t blink_led(uint16_t on_time_ms, uint16_t off_time_ms, uint8_t count,
-	bool wait_for_first_press);
+uint8_t count_button_presses(uint16_t led_on_time_ms,
+	uint16_t led_off_time_ms);
+
+/*
+ * Wait a fixed amount of time, blinking the LED (unless led_on_time_ms is 0).
+ *
+ * Returns the number of times the button was pressed.
+ */
+uint8_t delay(uint16_t led_on_time_ms, uint16_t led_off_time_ms,
+	uint16_t delay_ms);
 
 /*
  * Emit a brief beep the buzzer.

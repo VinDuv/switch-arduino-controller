@@ -24,15 +24,22 @@ int main(void)
 	/* Initial beep to confirm that the buzzer works */
 	beep();
 
+
 	/* Wait for the user to press the button (should be on the Switch main menu) */
-	blink_led(100, 100, 1, true);
+	count_button_presses(100, 100);
 
 	/* Set the virtual controller as controller 1 */
 	switch_controller(REAL_TO_VIRT, BOTH_LEDS);
 
 	for (;;) {
 		/* Feature selection menu */
-		uint8_t count = blink_led(100, 900, 2, true);
+		uint8_t count = count_button_presses(100, 900);
+
+		for (uint8_t i = 0 ; i < count ; i += 1) {
+			beep();
+			_delay_ms(100);
+		}
+
 
 		switch (count) {
 			case 1:
@@ -49,7 +56,7 @@ int main(void)
 
 			default:
 				/* Wrong selection */
-				blink_led(100, 200, 5, false);
+				delay(100, 200, 1500);
 			break;
 		}
 
@@ -71,7 +78,7 @@ void temporary_control(void)
 	switch_controller(VIRT_TO_REAL, KEEP_LEDS);
 
 	/* Wait for the user to press the button (should be on the Switch main menu) */
-	blink_led(100, 100, 1, true);
+	count_button_presses(100, 100);
 
 	/* Set the virtual controller as controller 1 */
 	switch_controller(REAL_TO_VIRT, BOTH_LEDS);
@@ -84,7 +91,7 @@ void temporary_control(void)
 static void repeat_press_a(void)
 {
 	uint8_t count = 0;
-	while (count_button_presses(50) == 0) {
+	while (delay(0, 0, 50) == 0) {
 		switch (count % 4) {
 			case 0:
 				set_leds(NO_LEDS);
@@ -132,7 +139,7 @@ void max_raid(void)
 		use_wishing_piece_and_pause();
 
 		/* Let the user choose what to do */
-		if (blink_led(250, 250, 10, false)) {
+		if (wait_for_button_timeout(250, 250, 5000)) {
 			/* User confirmed, continue */
 			break;
 		}
@@ -165,7 +172,7 @@ void max_raid(void)
 		beep();
 
 		/* Do the user wants to do this Raid? */
-		if (blink_led(250, 250, 10, false)) {
+		if (wait_for_button_timeout(250, 250, 5000)) {
 			/* Restore the clock */
 			set_leds(NO_LEDS);
 			set_clock_to_auto_from_manual(/* in_game */ true, KEEP_LEDS);
@@ -174,7 +181,7 @@ void max_raid(void)
 			switch_controller(VIRT_TO_REAL, KEEP_LEDS);
 
 			/* Wait for the user to press the button */
-			uint8_t result = blink_led(100, 100, 1, true);
+			uint8_t result = count_button_presses(100, 100);
 
 			/* Get back control */
 			switch_controller(REAL_TO_VIRT, KEEP_LEDS);
