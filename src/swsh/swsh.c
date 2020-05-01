@@ -24,7 +24,6 @@ int main(void)
 	/* Initial beep to confirm that the buzzer works */
 	beep();
 
-
 	/* Wait for the user to press the button (should be on the Switch main menu) */
 	count_button_presses(100, 100);
 
@@ -239,7 +238,7 @@ void set_text_speed(bool fast_speed, bool save)
 		{ BT_NONE,	DP_LEFT,	SEQ_MASH,	1 },	/* Move to Parameters position */
 
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1 },	/* Enter Parameters */
-		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
+		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	26 },	/* Wait for menu */
 
 		{ BT_NONE,	dir,		SEQ_MASH,	2 },	/* Select speed */
 
