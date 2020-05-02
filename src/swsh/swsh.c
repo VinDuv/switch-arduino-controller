@@ -15,6 +15,12 @@ static void set_text_speed(bool fast_speed, bool save);
 static void use_wishing_piece_and_pause(void);
 static void restart_game(void);
 static void change_raid(void);
+static void auto_breeding(void);
+static void reposition_player(bool first_time);
+static void go_to_nursery_helper(void);
+static void get_egg(void);
+static void move_in_circles(uint16_t cycles, bool go_up_first);
+static bool hatch_egg(void);
 
 int main(void)
 {
@@ -39,7 +45,6 @@ int main(void)
 			_delay_ms(100);
 		}
 
-
 		switch (count) {
 			case 1:
 				temporary_control();
@@ -51,6 +56,10 @@ int main(void)
 
 			case 3:
 				max_raid();
+			break;
+
+			case 4:
+				auto_breeding();
 			break;
 
 			default:
@@ -368,4 +377,252 @@ void change_raid(void)
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter raid */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
 	);
+}
+
+
+/*
+ * Automatically get Eggs from the Bridge Field Pokémon Nursery and hatch them.
+ */
+void auto_breeding(void)
+{
+	/* Hatching time for each Egg cycles */
+	const struct {
+		uint16_t hatch_time; /* Time passed spinning for the Egg to hatch */
+		uint16_t wait_time; /* Time passed spinning to get another Egg */
+	} egg_cycles[] = {
+		{ 350, 150 },	/*  5 Egg cycles, approx. 64 Eggs/hour */
+		{ 560,  0 },	/* 10 Egg cycles, approx. 60 Eggs/hour */
+		{ 1100, 0 },	/* 15 Egg cycles, approx. 50 Eggs/hour */
+		{ 1400, 0 },	/* 20 Egg cycles, approx. 40 Eggs/hour */
+		{ 1750, 0 },	/* 25 Egg cycles, approx. 33 Eggs/hour */
+		{ 2050, 0 },	/* 30 Egg cycles, approx. 30 Eggs/hour */
+		{ 2400, 0 },	/* 35 Egg cycles, approx. 24 Eggs/hour */
+		{ 2700, 0 },	/* 40 Egg cycles, approx. 22 Eggs/hour */
+	};
+
+	/* Note that the automation is mashing B while on the bike, so its speed is irregular.
+	   This explains while the spin time is not linear compared to the Egg cycles. */
+
+	/* Select the egg cycle */
+	uint16_t hatch_time;
+	uint16_t wait_time;
+
+	for (;;) {
+		uint8_t cycle_idx = count_button_presses(500, 500) - 1;
+
+		if (cycle_idx < (sizeof(egg_cycles) / sizeof(*egg_cycles))) {
+			/* Selection OK, beep once per press */
+			for (uint8_t i = 0 ; i <= cycle_idx ; i += 1) {
+				beep();
+				_delay_ms(200);
+			}
+
+			hatch_time = egg_cycles[cycle_idx].hatch_time;
+			wait_time = egg_cycles[cycle_idx].wait_time;
+
+			break;
+		}
+
+		/* Wrong selection */
+		delay(100, 200, 1500);
+	}
+
+	/* FIXME: Find a way to ensure the player character is on their bike instead of just
+	   toggling the state. For now, just require the player to start on the bike. */
+	#ifdef PUT_PLAYER_ON_BIKE
+	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		{ BT_P,		DP_NEUTRAL,	SEQ_HOLD,	1  }, /* Get on bike */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 }, /* Wait for bike animation to finish */
+	);
+	#endif
+
+	reposition_player(/* first_time */ true);
+	go_to_nursery_helper();
+
+	/* We do not known if an egg is already available, so we just spin the first time */
+	move_in_circles(hatch_time + wait_time, /* go_up_first */ true);
+
+	for (;;) {
+		reposition_player(/* first_time */ false);
+		go_to_nursery_helper();
+		get_egg();
+		move_in_circles(hatch_time, /* go_up_first */ true);
+
+		if (hatch_egg()) {
+			/* Operation stopped by the user */
+			break;
+		}
+
+		if (wait_time) {
+			move_in_circles(wait_time, /* go_up_first */ false);
+		}
+	}
+
+	/* Give temporary control before returning to the menu */
+	temporary_control();
+}
+
+
+/*
+ * Use the Flying Taxi to warp to the current position (the nursery) to reposition the
+ * player.
+ *
+ * first_time must be true the first time this function is called; it will then put the
+ * X menu’s cursor on the Map icon. It will also set the text speed to Fast.
+ */
+void reposition_player(bool first_time)
+{
+	/* Uses held A button to makes the text go faster. */
+
+	set_leds(NO_LEDS);
+
+	if (first_time) {
+		SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+			{ BT_X,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open menu */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
+			{ BT_NONE,	DP_TOPLEFT, SEQ_HOLD,	25 },	/* Move to top/left position */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	1  },	/* Release the buttons */
+
+			{ BT_NONE,	DP_BOTTOM,	SEQ_MASH,	1 },	/* Move to Map position */
+			{ BT_NONE,	DP_LEFT,	SEQ_MASH,	1 },	/* Move to Parameters position */
+
+			{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1 },	/* Enter Parameters */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	26 },	/* Wait for menu */
+
+			{ BT_NONE,	DP_RIGHT,	SEQ_MASH,	2 },	/* Select speed */
+
+			{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	10 },	/* Validate parameters */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	1 },	/* Release A to advance */
+			{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	10 },	/* Validate parameters */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	1 },	/* Release A to advance */
+			{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	1 },	/* Validate dialog */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
+
+			{ BT_NONE,	DP_RIGHT,	SEQ_MASH,	1 },	/* Move to Map position */
+		);
+	} else {
+		SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+			{ BT_X,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open menu */
+			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
+		);
+	}
+
+	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open map */
+		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	55 },	/* Wait for map */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Warp? */
+		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	1  },	/* Release A */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Accept */
+		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	60 },	/* Wait for warp to complete */
+	);
+}
+
+
+/*
+ * Go in front of the nursery helper.
+ * reposition_player must be called first.
+ */
+void go_to_nursery_helper(void)
+{
+	set_leds(TX_LED);
+
+	send_update(BT_NONE, DP_NEUTRAL, S_SCALED(S_BOTLEFT, 25), S_NEUTRAL);
+
+	for (uint8_t i = 0 ; i < 21 ; i += 1) {
+		send_update(BT_NONE, DP_NEUTRAL, S_BOTTOM, S_NEUTRAL);
+	}
+
+	send_update(BT_NONE, DP_NEUTRAL, S_RIGHT, S_NEUTRAL);
+	send_update(BT_NONE, DP_NEUTRAL, S_RIGHT, S_NEUTRAL);
+
+	/* Reset the sticks and wait for the player to be standing still */
+	pause_automation();
+	_delay_ms(400);
+}
+
+
+/*
+ * Get an Egg from the nursery helper.
+ * go_to_nursery_helper must be called first.
+ */
+void get_egg(void)
+{
+	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	10 },	/* Wait after movement */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Open “accept egg” dialog */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Accept egg */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	75 },	/* Wait for dialog  */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open “what do you want” dialog */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	50 },	/* Wait for dialog */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	20 },	/* Choose “include in team” */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open team dialog */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	45 },	/* Wait for dialog */
+		{ BT_NONE,	DP_BOTTOM,	SEQ_MASH,	1  },	/* Go to second Pokémon */
+		{ BT_A,		DP_BOTTOM,	SEQ_HOLD,	65 },	/* Select second Pokémon */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
+		{ BT_A,		DP_BOTTOM,	SEQ_HOLD,	35 },	/* Validate “… sent to box” dialog */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
+		{ BT_A,		DP_BOTTOM,	SEQ_MASH,	1  },	/* Validate “Take care” dialog */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait for dialog to close */
+	);
+}
+
+/*
+ * Move in circle for the specified number of cycles.
+ * go_to_nursery_helper must be called first for correct positioning.
+ */
+void move_in_circles(uint16_t cycles, bool go_up_first)
+{
+	set_leds(RX_LED);
+
+	if (go_up_first) {
+		send_update(BT_NONE, DP_NEUTRAL, S_SCALED(S_TOP, 25), S_NEUTRAL);
+
+		for (uint8_t i = 0 ; i < 10 ; i += 1) {
+			send_update(BT_NONE,	DP_NEUTRAL, S_TOP, S_NEUTRAL);
+			send_update(BT_B, 		DP_NEUTRAL, S_TOP, S_NEUTRAL);
+		}
+
+		for (uint8_t i = 0 ; i < 50 ; i += 1) {
+			send_update(BT_NONE, DP_NEUTRAL, S_TOPRIGHT, S_NEUTRAL);
+		}
+	}
+
+	for (uint16_t i = 0 ; i < (cycles / 2) ; i += 1) {
+		send_update(BT_NONE,	DP_NEUTRAL, S_RIGHT, S_LEFT);
+		send_update(BT_B,		DP_NEUTRAL, S_RIGHT, S_LEFT);
+	}
+
+	/* Reset sticks position */
+	pause_automation();
+}
+
+
+/*
+ * Hatch an egg. The “What?” dialog must be shown on screen.
+ * Returns true if the process was interrupted by the user.
+ */
+bool hatch_egg(void)
+{
+	set_leds(BOTH_LEDS);
+
+	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	1 },	/* Validate “What?” dialog */
+	)
+
+	/* Egg hatching animation */
+	if (delay(250, 250, 12500)) {
+		return true;
+	}
+
+	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Speed up egg dialog text */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Validate egg dialog */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	80 },	/* Wait for fadeout */
+	)
+
+	return false;
 }

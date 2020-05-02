@@ -149,3 +149,70 @@ re-enable the process. You can either press it once, or twice:
 TODO: Implement a process that will actually start the Max Raid Battle so you can see
 if the Pokémon is shiny, and either restart the game to retry, or gain back control to
 battle it.
+
+### Auto Breeding [Feature 4 - four button presses]
+
+This feature will automatically get Pokémon Eggs and hatch them.
+
+**Pre-requisites:**
+
+ - Be next to the Bridge Field Pokémon Nursery. This is the nursery that will provide the
+   Eggs to be hatched.
+ - **Be on your bike.**
+ - Your team needs to be full, with a Pokémon with the Flame Body ability in any slot
+   **except** the second one.
+ - Your bike needs to be fully upgraded.
+ - In the X Menu, the Settings button should be in the bottom right corner and the Map
+   button should be in the bottom left corner (their default position).
+
+You also need to known the Egg Cycle count of the Egg that are going to hatch.
+
+This feature depends on Eggs being available at the Nursery more often that they hatch,
+except for 5-cycle eggs. You may need to increase the changes of getting an Egg (by having
+the Oval Charm, and/or having two Pokémon having different IDs and/or species in the
+Nursery).
+
+**Note:** This feature does not require a special text speed to be set beforehand.
+However, it will modify these parameters during operation, and when done, the text speed
+will be set to “Fast”.
+
+After the feature is started, the LED will blink once per second. Press the button the
+following number of times, depending on the Egg Cycle number:
+
+| Egg Cycles | # presses | Approx. hatches / hour |
+| ---------- | --------- | ---------------------- |
+| 5          | 1         | 64                     |
+| 10         | 2         | 60                     |
+| 15         | 3         | 50                     |
+| 20         | 4         | 40                     |
+| 25         | 5         | 33                     |
+| 30         | 6         | 30                     |
+| 35         | 7         | 24                     |
+| 40         | 8         | 22                     |
+
+Once your selection is made, the buzzer will beep the number of times the button was
+pressed, to confirm your selection.
+
+At start, the following process is applied:
+
+1. Set text speed to “fast”
+2. Warp to the nearest location (which is the Bridge Field Pokémon Nursery)
+3. Move around, to make sure an Egg is available.
+
+The following steps will then be applied in a loop:
+
+1. Warp to the nearest location (which is the Bridge Field Pokémon Nursery)
+2. Get an Egg from the Nursery Helper, put it in slot 2, sending slot 2 to Box
+3. Move around in circles (not too near the grass to avoid collisions)
+4. Wait during the hatching animation
+5. (for egg cycles = 5) move around more to give more time for an Egg to be available
+
+The time for an Egg to hatch tends to vary a little bit, so the program will wait a bit
+more than necessary before stopping moving around and waiting for the Egg to hatch. The
+RX/TX LEDs light up during the wait; they should light up right after the “What?” dialog
+appears.
+
+During the Egg hatch animation (RX/TX lighted up, L blinking) you can interrupt the
+process by pressing the button. The process will give you back control. Press it again
+while on the Switch main menu (cursor on the game icon) to get back back into the
+automation “main menu” where you can choose another automation task.
