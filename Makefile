@@ -1,4 +1,4 @@
-CFLAGS=-Wall -std=c11 -Os -I src/usb-iface -I src/lib
+CFLAGS=-Wall -Wextra -Werror=overflow -Werror=type-limits -std=c11 -Os -I src/usb-iface -I src/lib
 
 # Optionally add <prog>.hex here so it is built when make is invoked
 # without arguments.
