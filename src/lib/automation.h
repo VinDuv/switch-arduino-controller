@@ -28,7 +28,6 @@ enum led_state {
 	TX_LED = 0x01, /* Turn on TX LED */
 	RX_LED = 0x02, /* Turn on RX LED */
 	BOTH_LEDS = 0x03, /* Turn on RX and TX LEDs */
-	KEEP_LEDS = 0x04, /* Do not change the LEDs state */
 };
 
 /* Stick coordinates */
@@ -120,22 +119,21 @@ void send_update(enum button_state buttons, enum d_pad_state d_pad,
  * Send a button sequence.
  * The first parameter is a pointer to an array of states to run in sequence.
  * The second parameter is the number of entries in the array.
- * The third parameter is the led state to set at the end of the sequence.
  */
 void send_button_sequence(const struct button_d_pad_state sequence[],
-	size_t sequence_length, enum led_state end_leds);
+	size_t sequence_length);
 
 /*
  * Macro to simplify the use of send_button_sequence.
  *
- * Example usage: SEND_BUTTON_SEQUENCE(NO_LEDS, { BUTTON_A, DP_NEUTRAL, SEQ_HOLD, 5},
+ * Example usage: SEND_BUTTON_SEQUENCE({ BUTTON_A, DP_NEUTRAL, SEQ_HOLD, 5},
  * { NO_BUTTONS, DP_TOP, SEQ_HOLD, 1 });
  */
-#define SEND_BUTTON_SEQUENCE(END_LEDS, FIRST_STATE, ...) \
+#define SEND_BUTTON_SEQUENCE(FIRST_STATE, ...) \
 	send_button_sequence((struct button_d_pad_state[]){ \
 		FIRST_STATE, __VA_ARGS__ }, sizeof((struct button_d_pad_state[]){ \
 		FIRST_STATE, __VA_ARGS__ }) / \
-		sizeof(struct button_d_pad_state), END_LEDS);
+		sizeof(struct button_d_pad_state));
 
 /*
  * Send an update that reset the button/controller state to a neutral state

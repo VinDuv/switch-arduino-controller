@@ -28,20 +28,18 @@ enum switch_mode {
  * currently playing game”. The virtual controller will (re-)connect (as controller 2),
  * activate the controller setup menu, validate it to become back controller 1, and
  * go back to the game.
- *
- * The second parameter allows setting the RX/TX LEDs once the operation completes.
  */
-void switch_controller(enum switch_mode mode, enum led_state end_led_state);
+void switch_controller(enum switch_mode mode);
 
 /*
  * Go to the main menu, from the currently playing game or menu.
  */
-void go_to_main_menu(enum led_state end_led_state);
+void go_to_main_menu(void);
 
 /*
  * Go back to the game, from the main menu.
  */
-void go_to_game(enum led_state end_led_state);
+void go_to_game(void);
 
 /*
  * Configure the Switch’s clock to manual mode, starting from the game or the
@@ -51,9 +49,8 @@ void go_to_game(enum led_state end_led_state);
  *
  * The first parameter indicates that the operations starts in-game (and will end
  * in-game)
- * The second parameter allows setting the RX/TX LEDs once the operation completes.
  */
-void set_clock_to_manual_from_any(bool in_game, enum led_state end_led_state);
+void set_clock_to_manual_from_any(bool in_game);
 
 /*
  * Configure the Switch’s clock to automatic mode, starting from the game or the
@@ -63,9 +60,8 @@ void set_clock_to_manual_from_any(bool in_game, enum led_state end_led_state);
  *
  * The first parameter indicates that the operations starts in-game (and will end
  * in-game)
- * The second parameter allows setting the RX/TX LEDs once the operation completes.
  */
-void set_clock_to_auto_from_manual(bool in_game, enum led_state end_led_state);
+void set_clock_to_auto_from_manual(bool in_game);
 
 /*
  * Apply an offset to the Switch’s clock’s year.
@@ -77,6 +73,6 @@ void set_clock_to_auto_from_manual(bool in_game, enum led_state end_led_state);
  * The second parameter is the year offset to apply (-1: substract a year, 1: add a year)
  * The third parameter allows setting the RX/TX LEDs once the operation completes.
  */
-void change_clock_year(bool in_game, int8_t offset, enum led_state end_led_state);
+void change_clock_year(bool in_game, int8_t offset);
 
 #endif

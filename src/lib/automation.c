@@ -98,10 +98,6 @@ bool init_automation(void)
 /* Set the LED state to be sent in the next request */
 void set_leds(enum led_state leds)
 {
-	if (leds == KEEP_LEDS) {
-		return;
-	}
-
 	if (leds & TX_LED) {
 		sent_data.magic_and_leds |= MAGIC_TX_STATE;
 	} else {
@@ -130,11 +126,10 @@ void send_update(enum button_state buttons, enum d_pad_state d_pad,
 
 /* Send a button sequence */
 void send_button_sequence(const struct button_d_pad_state sequence[],
-	size_t sequence_length, enum led_state end_leds)
+	size_t sequence_length)
 {
 	for (size_t pos = 0 ; pos < sequence_length ; pos += 1) {
 		const struct button_d_pad_state* cur = &sequence[pos];
-		bool is_last = (pos == (sequence_length - 1));
 
 		uint16_t repeat_count = cur->repeat_count;
 		enum seq_mode mode = cur->mode;
@@ -142,10 +137,6 @@ void send_button_sequence(const struct button_d_pad_state sequence[],
 		while (repeat_count > 0) {
 			sent_data.buttons = cur->buttons;
 			sent_data.d_pad = cur->d_pad;
-
-			if (is_last && repeat_count == 1) {
-				set_leds(end_leds);
-			}
 
 			send_current();
 

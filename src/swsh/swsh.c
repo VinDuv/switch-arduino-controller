@@ -34,9 +34,14 @@ int main(void)
 	count_button_presses(100, 100);
 
 	/* Set the virtual controller as controller 1 */
-	switch_controller(REAL_TO_VIRT, BOTH_LEDS);
+	switch_controller(REAL_TO_VIRT);
 
 	for (;;) {
+		/* Set the LEDs, and make sure automation is paused while in the
+		   menu */
+		set_leds(BOTH_LEDS);
+		pause_automation();
+
 		/* Feature selection menu */
 		uint8_t count = count_button_presses(100, 900);
 
@@ -67,10 +72,6 @@ int main(void)
 				delay(100, 200, 1500);
 			break;
 		}
-
-		/* Make sure the automation is paused before going back to the menu */
-		set_leds(BOTH_LEDS);
-		pause_automation();
 	}
 }
 
@@ -83,13 +84,13 @@ void temporary_control(void)
 	set_leds(NO_LEDS);
 
 	/* Allow the user to connect their controller back as controller 1 */
-	switch_controller(VIRT_TO_REAL, KEEP_LEDS);
+	switch_controller(VIRT_TO_REAL);
 
 	/* Wait for the user to press the button (should be on the Switch main menu) */
 	count_button_presses(100, 100);
 
 	/* Set the virtual controller as controller 1 */
-	switch_controller(REAL_TO_VIRT, BOTH_LEDS);
+	switch_controller(REAL_TO_VIRT);
 }
 
 
@@ -157,12 +158,13 @@ void max_raid(void)
 	}
 
 	/* While we are out of the game, set the Switch’s clock to manual */
-	set_clock_to_manual_from_any(/* in_game */ false, NO_LEDS);
+	set_clock_to_manual_from_any(/* in_game */ false);
 
 	/* Get back to the game, wait a bit for it to finish saving and close the text box. */
-	go_to_game(KEEP_LEDS);
+	set_leds(NO_LEDS);
+	go_to_game();
 
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_B,			DP_NEUTRAL,	SEQ_MASH,	30 },	/* Close all “save” dialogs */
 	);
 
@@ -170,7 +172,7 @@ void max_raid(void)
 	set_text_speed(/* fast_speed */ true, /* save */ true);
 
 	/* Open the Raid menu */
-	SEND_BUTTON_SEQUENCE(BOTH_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter Raid */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
 	);
@@ -183,16 +185,16 @@ void max_raid(void)
 		if (wait_for_button_timeout(250, 250, 5000)) {
 			/* Restore the clock */
 			set_leds(NO_LEDS);
-			set_clock_to_auto_from_manual(/* in_game */ true, KEEP_LEDS);
+			set_clock_to_auto_from_manual(/* in_game */ true);
 
 			/* Give back control */
-			switch_controller(VIRT_TO_REAL, KEEP_LEDS);
+			switch_controller(VIRT_TO_REAL);
 
 			/* Wait for the user to press the button */
 			uint8_t result = count_button_presses(100, 100);
 
 			/* Get back control */
-			switch_controller(REAL_TO_VIRT, KEEP_LEDS);
+			switch_controller(REAL_TO_VIRT);
 
 			if (result == 1) {
 				/* One press: done */
@@ -200,13 +202,13 @@ void max_raid(void)
 			}
 
 			/* Pause the game, change the clock to manual again, and restart the game */
-			go_to_main_menu(KEEP_LEDS);
-			set_clock_to_manual_from_any(/* in_game */ false, KEEP_LEDS);
+			go_to_main_menu();
+			set_clock_to_manual_from_any(/* in_game */ false);
 			restart_game();
 
 			/* Enter the Raid again; we need to change it because it’s the same as the one
 			   that was present just after the Wishing piece was dropped */
-			SEND_BUTTON_SEQUENCE(BOTH_LEDS,
+			SEND_BUTTON_SEQUENCE(
 				{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter Raid */
 				{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
 			);
@@ -237,7 +239,7 @@ void set_text_speed(bool fast_speed, bool save)
 	}
 
 	/* Uses held A button to makes the text go faster. */
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_X,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open menu */
 		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
 		{ BT_NONE,	DP_TOPLEFT, SEQ_HOLD,	25 },	/* Move to top/left position */
@@ -260,14 +262,14 @@ void set_text_speed(bool fast_speed, bool save)
 	);
 
 	if (save) {
-		SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		SEND_BUTTON_SEQUENCE(
 			{ BT_R,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open Save menu */
 			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	30 },	/* Wait for menu */
 			{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	1 },	/* Save the game */
 			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	80 },	/* Wait for save/menu closing */
 		);
 	} else {
-		SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		SEND_BUTTON_SEQUENCE(
 			{ BT_B,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Close the menu */
 			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	30 },	/* Wait for menu closing */
 		);
@@ -285,7 +287,7 @@ void set_text_speed(bool fast_speed, bool save)
 void use_wishing_piece_and_pause(void)
 {
 	/* A is held to speed up the text */
-	SEND_BUTTON_SEQUENCE(TX_LED,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	35 },	/* First confirmation dialog */
 		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	1  },	/* Release A */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	35 },	/* Validate dialog 1, open 2nd */
@@ -322,7 +324,7 @@ void use_wishing_piece_and_pause(void)
  */
 void restart_game(void)
 {
-	SEND_BUTTON_SEQUENCE(RX_LED,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_X,		DP_NEUTRAL,	SEQ_HOLD,	1 },	/* Ask to close game */
 		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	20 },	/* Wait for menu */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1 },	/* Confirm close */
@@ -333,7 +335,7 @@ void restart_game(void)
 	/* Wait for the game to start */
 	_delay_ms(17000);
 
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	1 },	/* Validate start screen */
 	);
 
@@ -353,10 +355,10 @@ void change_raid(void)
 {
 	/* Set the clock backwards */
 	set_leds(TX_LED);
-	change_clock_year(/* in_game */ true, /* offset */ -1, KEEP_LEDS);
+	change_clock_year(/* in_game */ true, /* offset */ -1);
 
 	/* Start the raid, but prepare to cancel it */
-	SEND_BUTTON_SEQUENCE(RX_LED,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter “multiple combat” */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	55 },	/* Wait */
 		{ BT_B,		DP_NEUTRAL,	SEQ_HOLD,	5  },	/* Open cancel menu (speed up text) */
@@ -364,10 +366,10 @@ void change_raid(void)
 	);
 
 	/* Set the clock forward */
-	change_clock_year(/* in_game */ true, /* offset */ +1, KEEP_LEDS);
+	change_clock_year(/* in_game */ true, /* offset */ +1);
 
 	/* Cancel the raid (exiting it), then re-enter it */
-	SEND_BUTTON_SEQUENCE(BOTH_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Cancel raid */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	100 },	/* Cancelling takes a loong time */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Absorb the watts (speed up text) */
@@ -430,7 +432,7 @@ void auto_breeding(void)
 	/* FIXME: Find a way to ensure the player character is on their bike instead of just
 	   toggling the state. For now, just require the player to start on the bike. */
 	#ifdef PUT_PLAYER_ON_BIKE
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_P,		DP_NEUTRAL,	SEQ_HOLD,	1  }, /* Get on bike */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 }, /* Wait for bike animation to finish */
 	);
@@ -477,7 +479,7 @@ void reposition_player(bool first_time)
 	set_leds(NO_LEDS);
 
 	if (first_time) {
-		SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		SEND_BUTTON_SEQUENCE(
 			{ BT_X,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open menu */
 			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
 			{ BT_NONE,	DP_TOPLEFT, SEQ_HOLD,	25 },	/* Move to top/left position */
@@ -501,13 +503,13 @@ void reposition_player(bool first_time)
 			{ BT_NONE,	DP_RIGHT,	SEQ_MASH,	1 },	/* Move to Map position */
 		);
 	} else {
-		SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+		SEND_BUTTON_SEQUENCE(
 			{ BT_X,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open menu */
 			{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	25 },	/* Wait for menu */
 		);
 	}
 
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Open map */
 		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	55 },	/* Wait for map */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Warp? */
@@ -547,7 +549,7 @@ void go_to_nursery_helper(void)
  */
 void get_egg(void)
 {
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	10 },	/* Wait after movement */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Open “accept egg” dialog */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
@@ -608,7 +610,7 @@ bool hatch_egg(void)
 {
 	set_leds(BOTH_LEDS);
 
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	1 },	/* Validate “What?” dialog */
 	)
 
@@ -617,7 +619,7 @@ bool hatch_egg(void)
 		return true;
 	}
 
-	SEND_BUTTON_SEQUENCE(KEEP_LEDS,
+	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Speed up egg dialog text */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release A */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Validate egg dialog */
