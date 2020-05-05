@@ -371,7 +371,7 @@ void change_raid(void)
 	/* Cancel the raid (exiting it), then re-enter it */
 	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Cancel raid */
-		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	100 },	/* Cancelling takes a loong time */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	120 },	/* Cancelling takes a loong time */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Absorb the watts (speed up text) */
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release the A button */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	15 },	/* Validate second message */

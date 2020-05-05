@@ -28,7 +28,7 @@ void switch_controller(enum switch_mode mode)
 
 		/* Enter change style/order, validating any “interrupt local comm” message */
 		{ BT_A,			DP_NEUTRAL,	SEQ_MASH,	16 },
-		{ BT_NONE,		DP_NEUTRAL,	SEQ_HOLD,	20 },	/* Wait for “Press L/R” menu */
+		{ BT_NONE,		DP_NEUTRAL,	SEQ_HOLD,	50 },	/* Wait for “Press L/R” menu */
 	);
 
 	if (mode == REAL_TO_VIRT) {
