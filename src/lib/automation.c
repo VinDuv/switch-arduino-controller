@@ -47,8 +47,8 @@ bool init_automation(void)
 	sent_data.r_stick = S_NEUTRAL;
 	sent_data.magic_and_leds = MAGIC_VALUE;
 
-	/* Wait 2 ms for initial ready signal */
-	_delay_ms(2);
+	/* Wait 12 ms for initial ready signal */
+	_delay_ms(12);
 	if (bit_is_set(UCSR0A, RXC0)) {
 		/* Retrieve ready signal byte */
 		uint8_t received = UDR0;

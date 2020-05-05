@@ -60,7 +60,7 @@ int main(void)
 	Serial_Init(BAUD, ENABLE_DOUBLESPEED);
 
 	/* Send the initial sync byte to the main µC */
-	_delay_ms(1);
+	_delay_ms(11);
 	Serial_SendByte(INIT_SYNC_CHAR);
 
 	/* Initialize LUFI */
