@@ -81,74 +81,132 @@ and return to the “main menu”.
 
 ### Max Raid Farming / Watts farming [Feature 3 - three button presses]
 
-This features allows repetitively restart a Max Raid until it gives the Pokémon you want,
-using only one Wishing Piece.
+This feature automates some aspects of Max Raid Battles, in order to get the
+Pokémon you want.
+
+When activated, you need to press the button again to select one of the three
+subfeatures, described below.
+
+#### Complete Max Raid Battle setup [Subfeature 1 - one button press]
+
+This subfeature is the main one; it gives you the wanted Max Raid Battle from
+an empty den, in a semi-automatic manner, using one Wishing Piece.
 
 **Pre-requisites:**
 
- - Be in front of a Pokémon Den. It should be completely empty (no light pillar, no glow
-   — if it is glowing, press A to collect the Watts and close the dialog box). Your
-   character should either face the center of the den or be on the bicycle (but check that
-   you can actually interact with the den in that case).
+ - Be in front of a Pokémon Den. It should be completely empty (no light
+   pillar, no glow — if it is glowing, press A to collect the Watts and close
+   the dialog box). Your character should either face the center of the den or
+   be on the bicycle (but check that you can actually interact with the den in
+   that case).
  - Have at least one Wishing Piece.
- - In the X Menu, the Settings button should be in the bottom right corner (its default
-   position).
- - The Switch’s clock should be set to roughly the current time, and that current time
-   should not be just before midnight (letting this automation feature running when the
-   day changes may cause undesired behavior).
- - Be in offline play before starting (online play can cause spurious “Disconnected from
-   the server” messages that will mess up the automation).
+ - In the X Menu, the Settings button should be in the bottom right corner (its
+   default position).
+ - The Switch’s clock should be set to roughly the current time, and that
+   current time should not be just before midnight (letting this automation
+   feature running when the day changes may cause undesired behavior).
+ - Be in offline play before starting (online play can cause spurious
+   “Disconnected from the server” messages that will mess up the automation).
 
-**Note:** This feature does not require a special text speed or automatic/manual clock
-configuration to be set beforehand. However, it will modify these parameters during
-operation, and when done, the text speed will be set to “Fast” and the clock setting
-will be set to “automatic”.
+**Note:** This feature does not require a special text speed or
+automatic/manual clock configuration to be set beforehand. However, it will
+modify these parameters during operation, and when done, the text speed will be
+set to “Fast” and the clock setting will be set to “automatic”.
 
-Before starting, you need to select which den to use. The Pokémon that can be found in
-a Max Raid Battle depend on the den and the light pillar color (red: normal Raid Battle,
-bright purple: rare Raid Battle). Choose the appropriate den, make sure the appropriate
-pre-requisite are met, then start the automation feature.
+Before starting, you need to select which den to use. The Pokémon that can be
+found in a Max Raid Battle depend on the den and the light pillar color (red:
+normal Raid Battle, bright purple: rare Raid Battle). Choose the appropriate
+den, make sure the appropriate pre-requisite are met, then start the automation
+feature.
 
-The process will start by setting the text speed to slow, and save the game. This is
-necessary the next step. It will then drop a Wishing Piece in the den, and pause the game
-after the light pillar start forming but before the game is saved. **Watch closely** as it
-happens: if the light pillar color (and thus the Raid Battle type) is what you want,
-**press the pushbutton** while the game is sitting on the home menu. If it isn’t, wait
-a couple of seconds; the process will quit/restart the game and re-drop the same Wishing
-Piece in a loop until you get the Max Raid Battle you want. Getting a rare Max Raid Battle
-(bright purple light pillar) may take a few minutes.
+The process will start by setting the text speed to slow, and save the game.
+This is necessary the next step. It will then drop a Wishing Piece in the den,
+and pause the game after the light pillar start forming but before the game is
+saved. **Watch closely** as it happens: if the light pillar color (and thus the
+Raid Battle type) is what you want, **press the pushbutton** while the game is
+sitting on the home menu. If it isn’t, wait a couple of seconds; the process
+will quit/restart the game and re-drop the same Wishing Piece in a loop until
+you get the Max Raid Battle you want. Getting a rare Max Raid Battle (bright
+purple light pillar) may take a few minutes.
 
-Once you press the button, the process will move on to the next step; the text speed will
-be set back to fast, and the Switch’s clock sync will be set to manual. The Max Raid
-Battle menu will be then entered.
+Once you press the button, the process will move on to the next step; the text
+speed will be set back to fast, and the Switch’s clock sync will be set to
+manual. The Max Raid Battle menu will be then entered.
 
-If the menu does not shown the Pokémon that you want, wait a few seconds; the process will
-change the clock date twice to reset the Max Raid Battle. You will also gain Watts in the
-process, which may be a good way to farm them.
+If the menu does not shown the Pokémon that you want, wait a few seconds; the
+process will change the clock date twice to reset the Max Raid Battle. You will
+also gain Watts in the process, which may be a good way to farm them.
 
-When the Pokémon that you want is shown, press the pushbutton. The clock settings will
-be restored and you will get back control. At this point, you can safely close the Max
-Raid Battle menu without losing the Pokémon, since the automation process always enter
-this menu with the clock set to the current day. You can then start online play (but
-go back to offline play before continuing the process) to battle the Pokémon, or save the
-game so you can re-battle the Pokémon in case it escapes (but note that Pokémon in rare
-Max Raid Battles — bright purple light pillar — have a 100% catch rate with any Pokéball
-so you will never lose them as long as you are not out of Pokéballs).
+When the Pokémon that you want is shown, press the pushbutton. The clock
+settings will be restored and you will get back control. At this point, you can
+safely close the Max Raid Battle menu without losing the Pokémon, since the
+automation process always enter this menu with the clock set to the current
+day. You can then start online play to battle the Pokémon, or save the game so
+you can re-battle the Pokémon in case it escapes (but note that Pokémon in rare
+Max Raid Battles — bright purple light pillar — have a 100% catch rate with any
+Pokéball so you will never lose them as long as you are not out of Pokéballs).
 
-Once you are done, you can go back to the Switch’s main menu and press the pushbutton to
-re-enable the process. You can either press it once, or twice:
+Once you are done, you can go back to the Switch’s main menu and press the
+pushbutton to get back to the automation “main menu” where you can choose
+another automation task. If you restart the game without saving, the light
+pillar will still be up, and you can change the Max Raid Pokémon by activating
+subfeature 3 (see below for details). Note that you can only get one Pokémon
+per Wishing Piece used.
 
- - If you press it once, you will be back into the automation “main menu” where you can
-   choose another automation task.
- - If you press it twice, the game will be closed, restarted, and the process will
-   continue changing the Pokémon in the Max Raid Battle. **This will only work if you have
-   not saved the game in the meantime, and the Pokémon you had selected will be lost.**
-   This allows getting another Pokémon using the same Wishing Piece, if the one you had
-   previously was not satisfying.
+#### Light pillar setup [Subfeature 2 - two button presses]
 
-TODO: Implement a process that will actually start the Max Raid Battle so you can see
-if the Pokémon is shiny, and either restart the game to retry, or gain back control to
-battle it.
+This subfeature perform the setup of the light pillar (so you can choose which
+light pillar color/Raid type is created by the Wishing Piece), but does not
+start the Max Raid Battle itself.
+
+See the previous subfeature for requirements. When you get the appropriate Raid
+type and push the button, you will be able to regain control. Pressing the
+button again (from the Switch’s main menu) will get you back to the automation
+“main menu” where you can choose another automation task.
+
+This subfeature can be useful if you want to perform some actions after setting
+up the light pillar but before entering the Max Raid Battle (for instance,
+getting a Catch combo, in order to increase the likelihood of getting a shiny
+Pokémon in the Max Raid Battle; this cannot be done before the light pillar
+setup since it requires restarting the game).
+
+#### Light pillar setup [Subfeature 3 - three button presses]
+
+This subfeature changes the Pokémon available in the Max Raid battle.
+
+**Pre-requisites:**
+
+ - Be in front of a Pokémon Den activated using a Wishing Piece (either
+   manually or by using subfeatures 1 or 2). It should not be glowing.
+ - In the X Menu, the Settings button should be in the bottom right corner (its
+   default position).
+ - The Switch’s clock should be set to roughly the current time, and that
+   current time should not be just before midnight (letting this automation
+   feature running when the day changes may cause undesired behavior).
+ - Be in offline play before starting (online play can cause spurious
+   “Disconnected from the server” messages that will mess up the automation).
+
+When activated, this feature will use clock changes to change the Pokémon
+available in the Max Raid Battle. Press the button once the Pokémon you want
+is shown; see subfeature 1 for details.
+
+Using this feature should not alter the Catch combo status (since it does not
+restart the game), so it may be possible to find shiny Pokémon in Max Raids
+using the following procedure (currently untested):
+
+1. Activate subfeature 2 to get the appropriate light pillar for the Pokémon
+   you want.
+2. Get a Catch combo for that Pokémon.
+3. Enter the Raid. If it is not the Pokémon you want, activate subfeature 3
+   to change it.
+4. When you get the Pokémon you want in the Max Raid Battle menu, enter the
+   battle with a very weak Pokémon (in order to lose the battle)
+5. If the Pokémon is indeed shiny, after you lose the battle, save the game.
+   This will allow you to get it back even if you restart the game. You can
+   then catch it (possibly in online mode).
+6. If the Pokémon is not shiny, after you lose the battle, enter the Max Raid
+   Battle again and activate subfeature 3 again. This will change the Pokémon
+   so you can retry step 4, hopefully without resetting the Catch combo.
 
 ### Auto Breeding [Feature 4 - four button presses]
 

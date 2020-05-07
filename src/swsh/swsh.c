@@ -10,7 +10,12 @@
 /* Static functions */
 static void temporary_control(void);
 static void repeat_press_a(void);
-static void max_raid(void);
+static void max_raid_menu(void);
+static void max_raid_setup(void);
+static void light_pillar_setup_with_control(void);
+static void repeat_change_raid(void);
+static void repeat_change_raid_initial_confirm(void);
+static void light_pillar_setup(void);
 static void set_text_speed(bool fast_speed, bool save);
 static void use_wishing_piece_and_pause(void);
 static void restart_game(void);
@@ -60,7 +65,7 @@ int main(void)
 			break;
 
 			case 3:
-				max_raid();
+				max_raid_menu();
 			break;
 
 			case 4:
@@ -130,14 +135,172 @@ static void repeat_press_a(void)
 
 
 /*
- * Allow choosing the Pokémon in a Max Raid Battle with one Wishing Piece.
+ * Max Raid Battle automation features
  */
-void max_raid(void)
+void max_raid_menu(void)
+{
+	/* Set the LEDs so the submenu is identifiable */
+	set_leds(TX_LED);
+	pause_automation();
+
+	for (;;) {
+		uint8_t subfeature = count_button_presses(500, 500);
+
+		for (uint8_t i = 0 ; i < subfeature ; i += 1) {
+			beep();
+			_delay_ms(200);
+		}
+
+		switch (subfeature) {
+			case 1: /* Full Max Raid Battle automation */
+				max_raid_setup();
+				return;
+			break;
+
+			case 2: /* Light pillar setup */
+				light_pillar_setup_with_control();
+				return;
+			break;
+
+			case 3: /* Change existing Wishing Piece Raid */
+				repeat_change_raid();
+				return;
+			break;
+
+			default:
+				/* Wrong selection */
+				delay(100, 200, 1500);
+			break;
+		}
+	}
+}
+
+
+/*
+ * Set up a light pillar for the appropriate Raid type (normal/rare) and
+ * restart the Raid until the wanted Pokémon is available.
+ */
+void max_raid_setup(void)
 {
 	/* First step: getting the appropriate light pillar */
+	light_pillar_setup();
 
-	/* Set text speed to slow so the light pillar appears before the game is saved; also
-	   save the game because it’s going to be restarted. */
+	/* While we are out of the game, set the Switch’s clock to manual */
+	set_clock_to_manual_from_any(/* in_game */ false);
+
+	/* Get back to the game, wait a bit for it to finish saving and close the
+	   text box. */
+	set_leds(NO_LEDS);
+	go_to_game();
+
+	SEND_BUTTON_SEQUENCE(
+		{ BT_B,			DP_NEUTRAL,	SEQ_MASH,	30 },	/* Close the dialogs */
+	);
+
+	/* Restore fast text speed */
+	set_text_speed(/* fast_speed */ true, /* save */ true);
+
+	/* Open the Raid menu */
+	SEND_BUTTON_SEQUENCE(
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter Raid */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
+	);
+
+	repeat_change_raid_initial_confirm();
+}
+
+
+/*
+ * From an empty Den, get a light pillar of the appropriate type.
+ * Restores the text speed and gives the user control before returning.
+ */
+void light_pillar_setup_with_control(void)
+{
+	light_pillar_setup();
+
+	/* Get back to the game, wait a bit for it to finish saving and close
+	   the text box. */
+	set_leds(NO_LEDS);
+	go_to_game();
+
+	SEND_BUTTON_SEQUENCE(
+		{ BT_B,			DP_NEUTRAL,	SEQ_MASH,	30 },	/* Close dialogs */
+	);
+
+	/* Restore fast text speed */
+	set_text_speed(/* fast_speed */ true, /* save */ false);
+
+	/* Give control temporarily before returning */
+	temporary_control();
+}
+
+
+/*
+ * Repeatedly change the Raid from a Den activated with a Wishing Piece. The
+ * first change is done immediately without confirmation, but the next ones ask
+ * for user confirmation. Gives back control to the user once they are
+ * satisfied with the Raid.
+ *
+ * Automatically sets the clock manual.
+ */
+void repeat_change_raid(void)
+{
+	set_clock_to_manual_from_any(/* in_game */ true);
+
+	/* Open the Raid menu */
+	SEND_BUTTON_SEQUENCE(
+		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter Raid */
+		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
+	);
+
+	/* Perform first change immediately */
+	change_raid();
+
+	/* Wait for user confirmation on the next changes, and give them control */
+	repeat_change_raid_initial_confirm();
+}
+
+
+/*
+ * Repeatedly change the Raid from an open Raid menu created with a Wishing
+ * Piece. Waits a bit for the user to confirm each change. Returns once the
+ * user is satisfied with the Raid.
+ *
+ * The clock must be set to manual.
+ */
+void repeat_change_raid_initial_confirm(void)
+{
+	for (;;) {
+		/* Ask the user to look at the Pokémon in the Max Raid Battle */
+		beep();
+
+		/* Do the user wants to do this Raid? */
+		if (wait_for_button_timeout(250, 250, 5000)) {
+			/* Restore the clock */
+			set_leds(NO_LEDS);
+			set_clock_to_auto_from_manual(/* in_game */ true);
+
+			/* Give control temporarily */
+			temporary_control();
+
+			/* Done */
+			break;
+		}
+
+		/* Change the Raid */
+		change_raid();
+	}
+}
+
+
+/*
+ * From an empty Den, get a light pillar of the appropriate type.
+ * When returning, text speed is slow and the game is paused.
+ */
+void light_pillar_setup(void)
+{
+	/* Set text speed to slow so the light pillar appears before the game is
+	   saved; also save the game because it’s going to be restarted. */
 	set_text_speed(/* fast_speed */ false, /* save */ true);
 
 	for (;;) {
@@ -156,68 +319,6 @@ void max_raid(void)
 		/* Restart the game to re-try dropping the Wishing Piece */
 		restart_game();
 	}
-
-	/* While we are out of the game, set the Switch’s clock to manual */
-	set_clock_to_manual_from_any(/* in_game */ false);
-
-	/* Get back to the game, wait a bit for it to finish saving and close the text box. */
-	set_leds(NO_LEDS);
-	go_to_game();
-
-	SEND_BUTTON_SEQUENCE(
-		{ BT_B,			DP_NEUTRAL,	SEQ_MASH,	30 },	/* Close all “save” dialogs */
-	);
-
-	/* Restore fast text speed */
-	set_text_speed(/* fast_speed */ true, /* save */ true);
-
-	/* Open the Raid menu */
-	SEND_BUTTON_SEQUENCE(
-		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter Raid */
-		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
-	);
-
-	for (;;) {
-		/* Ask the user to look at the Pokémon in the Max Raid Battle */
-		beep();
-
-		/* Do the user wants to do this Raid? */
-		if (wait_for_button_timeout(250, 250, 5000)) {
-			/* Restore the clock */
-			set_leds(NO_LEDS);
-			set_clock_to_auto_from_manual(/* in_game */ true);
-
-			/* Give back control */
-			switch_controller(VIRT_TO_REAL);
-
-			/* Wait for the user to press the button */
-			uint8_t result = count_button_presses(100, 100);
-
-			/* Get back control */
-			switch_controller(REAL_TO_VIRT);
-
-			if (result == 1) {
-				/* One press: done */
-				break;
-			}
-
-			/* Pause the game, change the clock to manual again, and restart the game */
-			go_to_main_menu();
-			set_clock_to_manual_from_any(/* in_game */ false);
-			restart_game();
-
-			/* Enter the Raid again; we need to change it because it’s the same as the one
-			   that was present just after the Wishing piece was dropped */
-			SEND_BUTTON_SEQUENCE(
-				{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter Raid */
-				{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait */
-			);
-		}
-
-		/* Change the Raid */
-		change_raid();
-	}
-
 }
 
 
@@ -408,6 +509,10 @@ void auto_breeding(void)
 	/* Select the egg cycle */
 	uint16_t hatch_time;
 	uint16_t wait_time;
+
+	/* Set the LEDs so the submenu is identifiable */
+	set_leds(RX_LED);
+	pause_automation();
 
 	for (;;) {
 		uint8_t cycle_idx = count_button_presses(500, 500) - 1;
