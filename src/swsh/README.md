@@ -289,3 +289,19 @@ When this feature is activated, it will start by moving the selection cursor
 to the top left Pokémon in the Box. It will then wait for input; press the
 button once to release all Pokémon in the current Box and move to the next Box
 (on the right); press the button twice when you are done.
+
+### Scan Boxes [Feature 6 - six button presses]
+
+This feature will move the cursor along each Pokémon in Box, before moving to
+the next Box, and so on.
+
+**Pre-requisite:**  The Boxes menu is open on the first Box which will be
+scanned.
+
+When this feature is activated, it will start by moving the selection cursor
+to the top left Pokémon in the Box, and then will start scanning all the Box
+then moving to the next Box. Hold the button down to interrupt the process and
+get back control.
+
+This feature allows checking the stats of many Pokémon at once, which is
+useful when you got many of them from Eggs.

@@ -27,9 +27,11 @@ static void get_egg(void);
 static void move_in_circles(uint16_t cycles, bool go_up_first);
 static bool hatch_egg(void);
 static void release_full_boxes(void);
+static void scan_boxes(void);
 static void position_box_cursor_topleft(void);
-static void for_each_box_pos(bool top_left_start, void (*callback)(void));
-static void release_from_box(void);
+static bool for_each_box_pos(bool top_left_start, bool (*callback)(void));
+static bool release_from_box(void);
+static bool check_button_press(void);
 
 
 int main(void)
@@ -79,6 +81,10 @@ int main(void)
 
 			case 5:
 				release_full_boxes();
+			break;
+
+			case 6:
+				scan_boxes();
 			break;
 
 			default:
@@ -778,6 +784,38 @@ void release_full_boxes(void)
 
 
 /*
+ * Moves the cursor around each Pokémon in each Box, so their stats are
+ * briefly shown. Stops the process when the button is held down.
+ */
+void scan_boxes(void)
+{
+	position_box_cursor_topleft();
+
+	bool cursor_topleft = true;
+
+	for (;;) {
+		/* Move around in the Box */
+		if (for_each_box_pos(cursor_topleft, &check_button_press)) {
+			/* The user stopped the operation */
+			break;
+		}
+
+		/* The cursor position was toggled by the operation */
+		cursor_topleft ^= true;
+
+		/* Move to the next Box */
+		SEND_BUTTON_SEQUENCE(
+			{ BT_R,		DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Next Box */
+			{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	25 },	/* Wait for Box */
+		);
+	}
+
+	/* Give back control to the user */
+	temporary_control();
+}
+
+
+/*
  * Position the cursor to the top left Pokémon in the Box menu.
  */
 void position_box_cursor_topleft(void)
@@ -803,8 +841,10 @@ void position_box_cursor_topleft(void)
  * The starting position can either be the top left Pokémon or the bottom
  * right. The ending cursor position will be the reverse of the starting
  * cursor position.
+ * Stops the process and return true if the callback returns true; else
+ * returns false.
  */
-void for_each_box_pos(bool top_left_start, void (*callback)(void))
+bool for_each_box_pos(bool top_left_start, bool (*callback)(void))
 {
 	/* Do we go left on even rows (row 0, row 2, etc)? */
 	uint8_t left_on_even = (top_left_start ? 0 : 1);
@@ -816,7 +856,9 @@ void for_each_box_pos(bool top_left_start, void (*callback)(void))
 		for (uint8_t col = 0 ; col < 5 ; col += 1) {
 			enum d_pad_state move_dir;
 
-			callback();
+			if (callback()) {
+				return true;
+			}
 
 			if ((row % 2) == left_on_even) {
 				move_dir = DP_RIGHT;
@@ -829,20 +871,26 @@ void for_each_box_pos(bool top_left_start, void (*callback)(void))
 			);
 		}
 
-		callback();
+		if (callback()) {
+			return true;
+		}
+
 		if (row < 4) {
 			SEND_BUTTON_SEQUENCE(
 				{ BT_NONE,	change_row_dir,	SEQ_MASH,	1 },
 			);
 		}
 	}
+
+	return false;
 }
 
 
 /*
  * Release from the Box the Pokémon on which the cursor is on.
+ * Returns false so for_each_box_pos continues execution.
  */
-void release_from_box(void)
+bool release_from_box(void)
 {
 	SEND_BUTTON_SEQUENCE(
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	8  },	/* Open menu */
@@ -853,4 +901,14 @@ void release_from_box(void)
 		{ BT_NONE,	DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Release 1 */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	10  },	/* Validate dialog 2 */
 	);
+
+	return false;
+}
+
+/*
+ * Checks if the button is pressed for a short period of time.
+ */
+bool check_button_press(void)
+{
+	return delay(0, 0, 20) != 0;
 }
