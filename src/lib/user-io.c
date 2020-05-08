@@ -136,6 +136,14 @@ uint8_t delay(uint16_t led_on_time_ms, uint16_t led_off_time_ms,
 
 	PORTB &= ~PORTB_LED;
 
+	if (delay_ms <= BUTTON_HOLD_TIME_MS) {
+		/* The wait delay is lower than the minimum hold time, so
+		   get_tracked_presses will not return a correct number of press times.
+		   Instead, we just return 1 if the button was held at all. */
+
+		return (info.hold_time > 0) ? 1 : 0;
+	}
+
 	/* Will wait for the button to be released */
 	return get_tracked_presses(&info);
 }
