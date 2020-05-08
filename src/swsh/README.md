@@ -274,3 +274,18 @@ During the Egg hatch animation (RX/TX lighted up, L blinking) you can interrupt 
 process by pressing the button. The process will give you back control. Press it again
 while on the Switch main menu (cursor on the game icon) to get back back into the
 automation “main menu” where you can choose another automation task.
+
+### Release Boxes [Feature 5 - five button presses]
+
+This feature allows releasing one or multiple Boxes of Pokémon.
+
+**Pre-requisites:**
+
+ - The Boxes menu is open on the first Box whose Pokémon are to be released.
+ - The selection modes (X/Y buttons) are normal.
+ - The Boxes whose Pokémon are to be released are completely full.
+
+When this feature is activated, it will start by moving the selection cursor
+to the top left Pokémon in the Box. It will then wait for input; press the
+button once to release all Pokémon in the current Box and move to the next Box
+(on the right); press the button twice when you are done.
