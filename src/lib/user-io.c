@@ -116,8 +116,9 @@ uint8_t delay(uint16_t led_on_time_ms, uint16_t led_off_time_ms,
 	uint16_t led_cycle_time_ms = led_on_time_ms + led_off_time_ms;
 	uint16_t led_cycle_pos = 1;
 	struct button_info info = {0, 0};
+	uint16_t remaining = delay_ms;
 
-	while (delay_ms > 0) {
+	while (remaining > 0) {
 		if (led_on_time_ms != 0) {
 			if (led_cycle_pos == 1) {
 				PORTB |= PORTB_LED;
@@ -130,7 +131,7 @@ uint8_t delay(uint16_t led_on_time_ms, uint16_t led_off_time_ms,
 
 		track_button(&info);
 
-		delay_ms -= 1;
+		remaining -= 1;
 		led_cycle_pos += 1;
 	}
 
