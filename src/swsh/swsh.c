@@ -445,7 +445,7 @@ void restart_game(void)
 		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	20 },	/* Wait for menu */
 		{ BT_A,		DP_NEUTRAL,	SEQ_HOLD,	1 },	/* Confirm close */
 		{ BT_NONE,	DP_NEUTRAL, SEQ_HOLD,	80 },	/* Wait for close */
-		{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	1 },	/* Relaunch game */
+		{ BT_A,		DP_NEUTRAL,	SEQ_MASH,	20 },	/* Relaunch game */
 	);
 
 	/* Wait for the game to start */
