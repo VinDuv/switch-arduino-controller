@@ -21,8 +21,9 @@ void switch_controller(enum switch_mode mode)
 	   cursor is on the game icon */
 
 	SEND_BUTTON_SEQUENCE(
-		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* News button */
-		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	3  },	/* Controllers button */
+		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* Switch Online button or News button (< v11) */
+		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	6  },	/* Sleep button */
+		{ BT_NONE,		DP_LEFT,	SEQ_MASH,	2  },	/* Controllers button */
 		{ BT_A,			DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter controllers settings */
 		{ BT_NONE,		DP_NEUTRAL,	SEQ_HOLD,	10 },	/* Wait for settings */
 
@@ -73,8 +74,9 @@ void set_clock_to_manual_from_any(bool in_game)
 	}
 
 	SEND_BUTTON_SEQUENCE(
-		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* News button */
-		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	4  },	/* Settings button */
+		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* Switch Online button or News button (< v11) */
+		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	6  },	/* Sleep button */
+		{ BT_NONE,		DP_LEFT,	SEQ_MASH,	1  },	/* Settings button */
 		{ BT_A,			DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter settings */
 		{ BT_NONE,		DP_NEUTRAL,	SEQ_HOLD,	20 },	/* Wait for settings */
 		{ BT_NONE,		DP_BOTTOM,	SEQ_MASH,	14 },	/* Console settings */
@@ -106,8 +108,9 @@ void set_clock_to_auto_from_manual(bool in_game)
 	}
 
 	SEND_BUTTON_SEQUENCE(
-		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* News button */
-		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	4  },	/* Settings button */
+		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* Switch Online button or News button (< v11) */
+		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	6  },	/* Sleep button */
+		{ BT_NONE,		DP_LEFT,	SEQ_MASH,	1  },	/* Settings button */
 		{ BT_A,			DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter settings */
 		{ BT_NONE,		DP_NEUTRAL,	SEQ_HOLD,	20 },	/* Wait for settings */
 		{ BT_NONE,		DP_BOTTOM,	SEQ_MASH,	14 },	/* Console settings */
@@ -148,8 +151,9 @@ void change_clock_year(bool in_game, int8_t offset)
 	}
 
 	SEND_BUTTON_SEQUENCE(
-		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* News button */
-		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	4  },	/* Settings button */
+		{ BT_NONE,		DP_BOTTOM,	SEQ_HOLD,	1  },	/* Switch Online button or News button (< v11) */
+		{ BT_NONE,		DP_RIGHT,	SEQ_MASH,	6  },	/* Sleep button */
+		{ BT_NONE,		DP_LEFT,	SEQ_MASH,	1  },	/* Settings button */
 		{ BT_A,			DP_NEUTRAL,	SEQ_HOLD,	1  },	/* Enter settings */
 		{ BT_NONE,		DP_NEUTRAL,	SEQ_HOLD,	20 },	/* Wait for settings */
 		{ BT_NONE,		DP_BOTTOM,	SEQ_MASH,	14 },	/* Console settings */
