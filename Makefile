@@ -38,7 +38,7 @@ src/%.elf:
 	avr-gcc $(CFLAGS) -mmcu=atmega328p -DF_CPU=16000000 -ffunction-sections -fdata-sections -flto -fuse-linker-plugin -o $@ -c $<
 
 clean:
-	rm -f src/{*/*,*}.{o,elf,eep} *.hex
+	rm -f *.hex src/*.o src/*.elf src/*.eep src/*/*.o src/*/*.elf src/*/*.eep
 	make -C src/usb-iface clean
 
 lufa/.git: .gitmodules
