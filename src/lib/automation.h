@@ -140,7 +140,7 @@ void send_button_sequence(const struct button_d_pad_state sequence[],
  * (no buttons pressed, sticks centered). This needs to be called if no updates
  * are going to be sent for a long period (more than a cycle length).
  */
-inline void pause_automation(void) {
+__attribute__((always_inline)) inline void pause_automation(void) {
 	send_update(BT_NONE, DP_NEUTRAL, S_NEUTRAL, S_NEUTRAL);
 }
 
