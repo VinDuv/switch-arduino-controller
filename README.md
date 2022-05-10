@@ -115,6 +115,9 @@ file, either manually or by running `make flash-usb-iface`.
 Unplug the programmer and connect it to the main microcontroller’s ISCP header.
 Flash the `swsh.hex` file, either manually or by running `make flash-swsh`.
 
+Use any programmer supported by avrdude, `avrdude -c ?`, by specifying
+`PROGRAMMER` when flashing. E.g. `make PROGRAMMER=usbtiny flash-swsh`.
+
 Factory restore
 ---------------
 
