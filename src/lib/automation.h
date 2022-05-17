@@ -150,6 +150,36 @@ __attribute__((always_inline)) inline void pause_automation(void) {
  */
 void send_current(void);
 
+/* Interrupt check function type */
+typedef bool (*inter_check_func_type)(void);
+
+/*
+ * Set up an automation interrupt function.
+ * This function which is called regularly when automation functions are called.
+ * It must return very quickly; if it returns true, automation is paused
+ * (controller reset to neutral) and all future calls to automation functions
+ * are skipped. Call automation_interrupted to check if automation was
+ * interrupted, and re-enable it.
+ */
+void setup_automation_interrupt(inter_check_func_type check_func);
+
+/*
+ * Allows another component to signal that automation should be interrupted,
+ * outside of the execution of automation function. The parameter should match
+ * the interrupt check function set up by the setup_automation_interrupt; if
+ * it doesn’t, nothing happens. This allows components to call this function
+ * even when they haven’t set up automation interrupt before, without side
+ * effects.
+ */
+void trigger_automation_interrupt(inter_check_func_type check_func);
+
+/*
+ * Checks if automation was interrupted. This also re-enables automation and
+ * disable interrupt checking; call setup_automation_interrupt to set it up
+ * again afterwards.
+ */
+bool automation_interrupted(void);
+
 /* Enter panic mode; the L LED will repetitively blink the number of times
    specified in the parameters. Values 0 to 3 are used internally by the
    automation functions and should not be specified. Never returns. */

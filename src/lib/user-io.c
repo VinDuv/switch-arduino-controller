@@ -3,6 +3,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "automation.h"
+
 /* LED (digital pin 13) on port B */
 #define PORTB_LED (1 << 5)
 
@@ -26,6 +28,7 @@ struct button_info {
 /* Static functions */
 static void track_button(struct button_info* info);
 static uint8_t get_tracked_presses(const struct button_info* info);
+static bool is_button_pressed(void);
 
 
 /* Initializes the LED/button interface. */
@@ -109,6 +112,26 @@ uint8_t count_button_presses(uint16_t led_on_time_ms,
 	return get_tracked_presses(&info);
 }
 
+/* Setup automation interrupt by button */
+void setup_button_automation_interrupt(void)
+{
+	setup_automation_interrupt(&is_button_pressed);
+}
+
+/* Returns true if automation was interrupted by the button being pressed */
+bool interrupted_by_button(void)
+{
+	if (automation_interrupted()) {
+		/* Wait for button release */
+		struct button_info info = {0, 0};
+		get_tracked_presses(&info);
+
+		return true;
+	}
+
+	return false;
+}
+
 /* Wait a fixed amount of time, blinking the LED */
 uint8_t delay(uint16_t led_on_time_ms, uint16_t led_off_time_ms,
 	uint16_t delay_ms)
@@ -172,6 +195,10 @@ void track_button(struct button_info* info)
 		/* The button is held; increment the hold time */
 		info->hold_time += 1;
 
+
+		/* If automation interrupt by button was enabled, trigger it */
+		trigger_automation_interrupt(&is_button_pressed);
+
 	} else {
 		/* Check if the button was just released after being held for
 		   a sufficient time */
@@ -207,3 +234,11 @@ uint8_t get_tracked_presses(const struct button_info* info)
 	return count;
 }
 
+
+/*
+ * Check if the button is currently pressed
+ */
+bool is_button_pressed(void)
+{
+	return ((PINB & PORTB_BUTTON) == 0);
+}

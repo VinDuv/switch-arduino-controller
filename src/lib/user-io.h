@@ -39,6 +39,21 @@ uint8_t count_button_presses(uint16_t led_on_time_ms,
 	uint16_t led_off_time_ms);
 
 /*
+ * Setup automation interrupt by button. If the button is pressed during
+ * automation after this function, automation will be interrupted, and
+ * was_interrupted_by_bytton will return true.
+ */
+void setup_button_automation_interrupt(void);
+
+/*
+ * Returns true if automation was interrupted by the button being pressed.
+ * Waits for the button to be released before returning.
+ * setup_button_automation_interrupt will need to be called again to setup
+ * automation interrupt by button when this function returns true.
+ */
+bool interrupted_by_button(void);
+
+/*
  * Wait a fixed amount of time, blinking the LED (unless led_on_time_ms is 0).
  *
  * Returns the number of times the button was pressed.

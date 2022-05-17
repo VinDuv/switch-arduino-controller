@@ -17,6 +17,15 @@ static struct {
 } sent_data;
 _Static_assert(sizeof(sent_data) == DATA_SIZE, "Incorrect sent data size");
 
+/* Indicates if automation was interrupted */
+static bool interrupted;
+
+/* Function called to check if an interrupt happened */
+static inter_check_func_type inter_check_func;
+
+/* Default interrupt check function, always return false */
+static bool disabled_inter_check(void);
+
 /*
  * Init the automation: sets up the serial link to the USB µC,
  * and initializes the controller state with default data.
@@ -25,6 +34,10 @@ _Static_assert(sizeof(sent_data) == DATA_SIZE, "Incorrect sent data size");
  */
 bool init_automation(void)
 {
+	/* Initialize interrupt check to default */
+	inter_check_func = &disabled_inter_check;
+	interrupted = false;
+
 	/* Set the serial link speed */
     UBRR0H = UBRRH_VALUE;
     UBRR0L = UBRRL_VALUE;
@@ -155,13 +168,27 @@ void send_button_sequence(const struct button_d_pad_state sequence[],
 /* Send an update with the current state */
 void send_current(void)
 {
+	if (interrupted) {
+		return;
+	}
+
 	/* Wait for ready signal for USB µC */
-	loop_until_bit_is_set(UCSR0A, RXC0);
+	do {
+		interrupted = inter_check_func() || interrupted;
+	} while (bit_is_clear(UCSR0A, RXC0));
 
 	/* Retrieve ready signal byte */
 	uint8_t received = UDR0;
 	if (received != READY_FOR_DATA_CHAR) {
 		panic(2);
+	}
+
+	/* If interrupted, reset the controller data to neutral */
+	if (interrupted) {
+		sent_data.buttons = BT_NONE;
+		sent_data.d_pad = DP_NEUTRAL;
+		sent_data.l_stick = S_NEUTRAL;
+		sent_data.r_stick = S_NEUTRAL;
 	}
 
 	const char* cur_sent_data = (const char*)&sent_data;
@@ -170,8 +197,45 @@ void send_current(void)
 		loop_until_bit_is_set(UCSR0A, UDRE0);
 		UDR0 = cur_sent_data[idx];
 	}
+
 }
 
+/* Default interrupt check function, always return false */
+bool disabled_inter_check(void) {
+	return false;
+}
+
+/* Set up an automation interrupt function */
+void setup_automation_interrupt(inter_check_func_type check_func)
+{
+	if (inter_check_func != &disabled_inter_check) {
+		panic(5); /* Automation interrupt already set up */
+	}
+
+	inter_check_func = check_func;
+}
+
+/* Trigger automation interrupt if needed */
+void trigger_automation_interrupt(inter_check_func_type check_func)
+{
+	if (check_func == inter_check_func) {
+		interrupted = true;
+	}
+}
+
+/* Checks if automation was interrupted */
+bool automation_interrupted(void)
+{
+	if (!interrupted) {
+		return false;
+	}
+
+	/* Reset interrupt check func and interrupted status */
+	inter_check_func = &disabled_inter_check;
+	interrupted = false;
+
+	return true;
+}
 
 /* Enter panic mode */
 void panic(uint8_t mode)
