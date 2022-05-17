@@ -1,4 +1,5 @@
 CFLAGS=-Wall -Wextra -Werror=overflow -Werror=type-limits -std=c11 -Os -I src/usb-iface -I src/lib
+PROGRAMMER=avrispmkii
 
 # Optionally add <prog>.hex here so it is built when make is invoked
 # without arguments.
@@ -11,13 +12,13 @@ all: swsh.hex usb-iface.hex
 src/swsh.elf: src/swsh/swsh.o src/lib/automation.o src/lib/automation-utils.o src/lib/user-io.o
 
 flash-%: %.hex
-	avrdude -p atmega328p -c avrispmkii -P usb -U flash:w:$<:i
+	avrdude -p atmega328p -c $(PROGRAMMER) -P usb -U flash:w:$<:i
 
 flash-usb-iface: usb-iface.hex
-	avrdude -p m16u2 -c avrispmkii -P usb -U flash:w:$< -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U efuse:w:0xF4:m -U lock:w:0x0F:m
+	avrdude -p m16u2 -c $(PROGRAMMER) -P usb -U flash:w:$< -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U efuse:w:0xF4:m -U lock:w:0x0F:m
 
 restore-usb-iface: UNO-dfu_and_usbserial_combined.hex
-	avrdude -p m16u2 -c avrispmkii -P usb -U flash:w:$< -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U efuse:w:0xF4:m -U lock:w:0x0F:m
+	avrdude -p m16u2 -c $(PROGRAMMER) -P usb -U flash:w:$< -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U efuse:w:0xF4:m -U lock:w:0x0F:m
 
 usb-iface.hex: lufa/.git src/usb-iface/usb-iface.c src/usb-iface/standalone-usb-iface.c src/usb-iface/usb-descriptors.c
 	$(MAKE) -C src/usb-iface usb-iface.hex
