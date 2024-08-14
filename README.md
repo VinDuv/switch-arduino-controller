@@ -76,9 +76,12 @@ Required software
 -----------------
 
 An AVR toolchain providing `avr-gcc`, `avr-objcopy` and `avrdude` in the
-`PATH`. On macOS,
-[CrossPack AVR](https://www.obdev.at/products/crosspack/index.html) can be
-used.
+`PATH`.
+
+ - On macOS, you can install `avr-gcc avr-binutils avr-libc avrdude` from
+   [MacPorts](http://macports.org/). Homebrew might also be used.
+ - On Debian Linux and similar distributions, you can install
+   `gcc-avr avr-libc binutils-avr avrdude`.
 
 LUFA [[3]] is used for the USB interface handling; it is included in this
 repository as a submodule and will be automatically retrieved if needed.
