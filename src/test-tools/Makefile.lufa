@@ -1,5 +1,4 @@
-# Specific Makefile to build the USB interface program using the LUFA library
-# and build system.
+# USB interface Makefile. TEST_SRC and TARGET must be set by the caller.
 
 MCU = atmega16u2
 ARCH = AVR8
@@ -7,11 +6,9 @@ BOARD = UNO
 F_CPU = 16000000
 F_USB = $(F_CPU)
 OPTIMIZATION = s
-TARGET = usb-iface
-SRC = usb-iface.c usb-descriptors.c $(LUFA_SRC_USB)
-
 LUFA_PATH = ../../lufa/LUFA
-CC_FLAGS = -DUSE_LUFA_CONFIG_HEADER
+CC_FLAGS = -DUSE_LUFA_CONFIG_HEADER -I ../usb-iface -Wno-array-bounds
+SRC = $(TEST_SRC) ../usb-iface/usb-descriptors.c $(LUFA_SRC_USB)
 
 all:
 

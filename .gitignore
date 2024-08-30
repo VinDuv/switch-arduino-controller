@@ -4,4 +4,8 @@
 *.eep
 *.o
 *.map
+*.bin
+*.lss
+*.sym
 src/usb-iface/obj
+src/test*tools/obj
