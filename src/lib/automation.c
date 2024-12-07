@@ -124,6 +124,19 @@ void send_update(enum button_state buttons, enum d_pad_state d_pad,
 	send_current();
 }
 
+
+/* Send button press followed by a release. */
+void send_buttons(enum button_state buttons, enum d_pad_state d_pad,
+	uint8_t repeat_count)
+{
+	while (repeat_count > 0) {
+		send_update(buttons, d_pad, S_NEUTRAL, S_NEUTRAL);
+		send_update(BT_NONE, DP_NEUTRAL, S_NEUTRAL, S_NEUTRAL);
+		repeat_count -= 1;
+	}
+}
+
+
 /* Send a button sequence */
 void send_button_sequence(const struct button_d_pad_state sequence[],
 	size_t sequence_length)

@@ -116,6 +116,13 @@ void send_update(enum button_state buttons, enum d_pad_state d_pad,
 	struct stick_coord l_stick, struct stick_coord r_stick);
 
 /*
+ * Send button press followed by a release.
+ * The press/release sequence is repeated by the specified count.
+ */
+void send_buttons(enum button_state buttons, enum d_pad_state d_pad,
+	uint8_t repeat_count);
+
+/*
  * Send a button sequence.
  * The first parameter is a pointer to an array of states to run in sequence.
  * The second parameter is the number of entries in the array.

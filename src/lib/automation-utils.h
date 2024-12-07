@@ -75,4 +75,23 @@ void set_clock_to_auto_from_manual(bool in_game);
  */
 void change_clock_year(bool in_game, int8_t offset);
 
+/*
+ * Enter a number of the Switch keyboard.
+ *
+ * The keyboard must already be on the screen and its cursor on the number 1.
+ * Leading zeroes are not included.
+ */
+void type_number_on_keyboard(uint32_t number);
+
+/*
+ * Enter a series of digits on the Switch keyboard.
+ *
+ * Takes and array of integers between 0 and 9 and types them on the Switch
+ * keyboard. The end of the array is signaled by an out-of-bounds integers (-1,
+ * for instance).
+ * The keyboard must already be on the screen and its cursor on the number 1.
+ * Leading zeroes are not included.
+ */
+void type_digits_on_keyboard(const int8_t* digits);
+
 #endif

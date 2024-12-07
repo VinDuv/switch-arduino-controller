@@ -178,3 +178,60 @@ void change_clock_year(bool in_game, int8_t offset)
 		go_to_game();
 	}
 }
+
+
+/* Enter a number of the Switch keyboard. */
+void type_number_on_keyboard(uint32_t number)
+{
+	/* A 32-bit unsigned number can have up to 10 digits (+ terminator) */
+	int8_t digits[11];
+	int8_t* digits_ptr = digits + 10;
+
+	*digits_ptr = -1;
+	if (number == 0) {
+		digits_ptr -= 1;
+		*digits_ptr = 0;
+	} else {
+		while (number > 0) {
+			digits_ptr -= 1;
+			*digits_ptr = number % 10;
+			number = number / 10;
+		}
+	}
+
+	type_digits_on_keyboard(digits_ptr);
+}
+
+
+/* Enter a series of digits on the Switch keyboard. */
+void type_digits_on_keyboard(const int8_t* digits)
+{
+	/* 0 is represented by 10 since it’s after 9 on the keyboard */
+	int8_t selected_digit = 1;
+
+	for (;;) {
+		int8_t cur_digit = *digits;
+		digits += 1;
+
+		if (cur_digit < 0 || cur_digit > 9) {
+			break;
+		}
+
+		if (cur_digit == 0) {
+			cur_digit = 10;
+		}
+
+		const int8_t offset = selected_digit - cur_digit;
+		if (offset < 0) {
+			send_buttons(BT_NONE, DP_RIGHT, -offset);
+		} else {
+			send_buttons(BT_NONE, DP_LEFT, offset);
+		}
+
+		send_buttons(BT_A, DP_NEUTRAL, 1);
+		selected_digit = cur_digit;
+	}
+
+	// Put the cursor back to the 1 digit
+	send_buttons(BT_NONE, DP_LEFT, selected_digit - 1);
+}
