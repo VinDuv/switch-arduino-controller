@@ -3,13 +3,14 @@ PROGRAMMER=avrispmkii
 
 # Optionally add <prog>.hex here so it is built when make is invoked
 # without arguments.
-all: swsh.hex usb-iface.hex
+all: swsh.hex bdsp.hex usb-iface.hex
 	@echo "Build done. Use flash-<program name> to flash a file."
 
 # Put program definitions (.o => src/<prog>.elf) here
 # make <prog>.hex will generate the final program and make flash-<prog> will
 # flash it.
 src/swsh.elf: src/swsh/swsh.o src/lib/automation.o src/lib/automation-utils.o src/lib/user-io.o
+src/bdsp.elf: src/bdsp/bdsp.o src/lib/persist.o src/lib/automation.o src/lib/automation-utils.o src/lib/user-io.o
 
 flash-%: %.hex
 	avrdude -p atmega328p -c $(PROGRAMMER) -P usb -U flash:w:$<:i

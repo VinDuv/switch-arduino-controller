@@ -15,6 +15,12 @@ Pokémon Sword/Shield automation
 A sample program is provided to automate some tasks in Pokémon Sword/Shield.
 Details about this can be found in [this file](src/swsh/README.md).
 
+Pokémon Brilliant Diamond/Shining Pearl automation
+--------------------------------------------------
+
+A sample program is provided to automate some tasks in Pokémon BD/SP.
+Details about this can be found in [this file](src/bdsp/README.md).
+
 How does it work?
 -----------------
 
